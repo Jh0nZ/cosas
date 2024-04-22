@@ -13,8 +13,12 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "back/(.*)",
       "dest": "server/wsgi.py"
+    },
+    {
+      "src": "front/(.*)",
+      "dest": "client/src/index.js"
     }
   ]
 }
