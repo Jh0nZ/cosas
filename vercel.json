@@ -9,7 +9,7 @@
   ],
   "routes": [
     {
-      "src": "front/(.*)",
+      "src": "(.*)",
       "dest": "client/src/index.js"
     }
   ]
