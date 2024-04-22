@@ -94,10 +94,14 @@ WSGI_APPLICATION = 'server.wsgi.application'
 
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost:5432/mysite',
-        conn_max_age=600
-    )
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "frienderdb",
+        "USER": "pepe",
+        "PASSWORD": "kx8s6a5q0xuq2eDfT1yoniYkN8j5grIh",
+        "HOST": "dpg-cnuqn4a1hbls73c8kee0-a.oregon-postgres.render.com",
+        "PORT": "5432",
+    }
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
