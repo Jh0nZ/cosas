@@ -94,7 +94,7 @@ WSGI_APPLICATION = "server.wsgi.application"
 
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgresql://jhon:K4OS5I4gYpAj7SDeJBtXFLjPiblCfM5H@localhost:5432/sis", conn_max_age=600
+        default="postgresql://jhon:K4OS5I4gYpAj7SDeJBtXFLjPiblCfM5H@dpg-cqd7r7bv2p9s73e9jin0-a/sis", conn_max_age=600
     )
 }
 
