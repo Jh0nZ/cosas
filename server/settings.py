@@ -154,5 +154,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://friender.vercel.app",
+    "https://cosas-psi.vercel.app"
 ]  # quien puede acceder a la api hacer peticiones
