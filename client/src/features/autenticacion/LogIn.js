@@ -4,68 +4,83 @@ import "./Login.css";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 import { useLoginMutation } from "./authSlice";
 import { useGlobalContext } from "../../context";
-import NavBar from "../../Components/NavBar.js";
 import logo from "../../logo-friender.png";
 import { useCookies } from "react-cookie";
+import { useRedirectIfAuthenticated } from "../../hooks/isAuthenticated.js";
 
 const LogIn = () => {
+  const redirectIfAuth = useRedirectIfAuthenticated();
+  redirectIfAuth();
   const [cookies, setCookie] = useCookies(["token"]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [feedbackText, setFeedbackText] = useState("");
-
-  const [showFeedback, setShowFeedback] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [disableBtn, setDisableBtn] = useState(false);
   const [disableBtnLoading, setDisableBtnLoading] = useState(false);
-  const [disableBlockedPasswordBox, setBlockedPasswordBox] = useState(true);
+  const [remainingTime, setRemainingTime] = useState(0);
+  const [supportingText, setSupportingText] = useState("");
 
   const navigate = useNavigate();
 
   const { setClientId } = useGlobalContext();
 
-  const [login, { data: response, isLoading, isSuccess, isError, error: responseError }] =
-    useLoginMutation();
+  const [
+    login,
+    { data: response, isLoading, isSuccess, isError, error: responseError },
+  ] = useLoginMutation();
 
   const handleBtn = async (e) => {
     e.preventDefault();
-    if (username && password) {
-      const form = new FormData();
-      form.append("username_or_email", username);
-      form.append("password", password);
-      await login(form);
-    }
-  };
-
-  const handleBlockedPasswordBox = () => {
-    setBlockedPasswordBox(true);
-    setDisableBtn(true);
-    setTimeout(() => {
-      setDisableBtn(false);
-    }, 7000);
+    const form = new FormData();
+    form.append("username_or_email", username);
+    form.append("password", password);
+    await login(form);
   };
 
   useEffect(() => {
+    console.log(response, "response");
+
     if (isLoading) {
       setDisableBtnLoading(true);
-      setShowFeedback(false);
+      setSupportingText("");
     }
     if (isSuccess) {
-      console.log(response);
-      setClientId(response.id); //as;ldjkfl;ashidf 'as
+      setClientId(response.id);
+      window.localStorage.setItem("clientId", response.id);
       setCookie("token", response.token);
-      navigate("/amigos/page/1");
+      navigate("/amigos?pagina=1");
     }
     if (isError) {
+      console.log(responseError, "error");
       setDisableBtnLoading(false);
-      setShowFeedback(true);
-      console.log(responseError);
-      setFeedbackText(responseError.data.error);
+      if (responseError.data.tiempo) {
+        setSupportingText("");
+        const tiempoRestante = responseError.data.tiempo;
+        if (tiempoRestante) {
+          setRemainingTime(tiempoRestante);
+          console.log(tiempoRestante);
+          const timer = setInterval(() => {
+            setRemainingTime((prevTime) => prevTime - 1);
+          }, 1000);
+          // cuando llegue a 0 lo eliminamos
+          setTimeout(() => {
+            clearInterval(timer);
+          }, tiempoRestante * 1000);
+        } else {
+          console.log("Error:", responseError.data.error); // Log en caso de error
+        }
+      } else {
+        setSupportingText(responseError.data.error);
+      }
     }
   }, [
     isError,
     isLoading,
-    isSuccess
+    isSuccess,
+    navigate,
+    response,
+    responseError,
+    setClientId,
+    setCookie,
   ]);
 
   const toggleShowPassword = () => {
@@ -91,7 +106,8 @@ const LogIn = () => {
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value.trim())}
-              placeholder="Correo electrónico"
+              placeholder="Usuario o Correo electrónico"
+              maxLength={255}
             />
           </div>
 
@@ -103,34 +119,35 @@ const LogIn = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Contraseña"
+              maxLength={65}
             />
-            <span className="password-icon" onClick={toggleShowPassword}>
+            <span className="login-password-icon" onClick={toggleShowPassword}>
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
-
-          {showFeedback && (
+          {supportingText && (
             <p className="text-danger mb-2 login-box-text-danger">
-              {feedbackText}
+              {supportingText}
+            </p>
+          )}
+          {remainingTime > 0 && (
+            <p className="text-danger mb-2 login-box-text-danger">
+              Inténtalo de nuevo en {remainingTime} segundos.
             </p>
           )}
 
           <button
             className={`btn btn-azul mb-2 button-login ${
               disableBtnLoading && "disabled"
-            } ${disableBtn && "disabled"}`}
+            } `}
+            disabled={remainingTime > 0}
             onClick={handleBtn}
           >
             Iniciar Sesión
           </button>
-          {disableBtn && (
-            <p className="text-danger mb-2 login-box-text-danger">
-              Intenta ingresar luego de 60 segundos.
-            </p>
-          )}
 
           <p className="form-text">
-            <Link to={"/resetPassword"}>¿Haz olvidado la contraseña?</Link>
+            <Link to={"/resetPassword"}>¿Has olvidado la contraseña?</Link>
           </p>
 
           <div className="login-box-separator">
@@ -142,35 +159,6 @@ const LogIn = () => {
             ¿No tienes una cuenta?<Link to={"/registrar"}> Regístrate</Link>
           </p>
         </form>
-      </div>
-      <div
-        className={`flex-column justify-content-rigth align-items-center modal-bloqueo ${
-          disableBlockedPasswordBox ? "hidden" : ""
-        }`}
-      >
-        <h2>Se impidió un inicio de sesión sospechoso</h2>
-        <br></br>
-        <p>
-          Bloqueamos un intento de acceder a tu cuenta porque no estábamos
-          seguros de si realmente eras tú.
-        </p>
-        <br></br>
-        <p>
-          Esto sucede cuando detectamos actividades de inicio de sesión
-          inusuales, como el intento de iniciar sesión demasiadas veces.
-        </p>
-        <br></br>
-        <p>
-          Tendrás que esperar 60 segundos para intentar iniciar sesión
-          nuevamente.
-        </p>
-        <br></br>
-        <button
-          className={`btn btn-azul mb-2`}
-          onClick={handleBlockedPasswordBox}
-        >
-          Entendido
-        </button>
       </div>
     </div>
   );

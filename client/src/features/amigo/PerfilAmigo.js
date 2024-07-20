@@ -5,17 +5,20 @@ import Loading from "../../Components/Loading";
 import "./PerfilAmigo.css";
 import Formulario from "../solicitudes/Formulario";
 import { useCookies } from "react-cookie";
+import Foto from "../../Components/imagRegistro/test";
+import Preview from "../../Components/imagRegistro/preview";
 
 const PerfilAmigo = () => {
   const [cookies] = useCookies(["token"]);
   const token = cookies.token;
+  const [foto, setFoto] = useState(""); //para la preview
 
   const { id_amigo } = useParams();
   const {
     data: amigo,
     isFetching,
     isSuccess,
-  } = useGetAmigoByIdQuery({ id_amigo, token });
+  } = useGetAmigoByIdQuery({ id_amigo: id_amigo, token: token });
   const [showForm, setShowForm] = useState(false);
   const [formStatus, setFormStatus] = useState({
     sent: false,
@@ -24,7 +27,7 @@ const PerfilAmigo = () => {
   });
   const calificacionEstrellas = (calificacion) => {
     const numEstrellas = Math.round(calificacion);
-    const estrellas = '★'.repeat(numEstrellas) + '☆'.repeat(5 - numEstrellas);
+    const estrellas = "★".repeat(numEstrellas) + "☆".repeat(5 - numEstrellas);
     return estrellas;
   };
 
@@ -43,8 +46,8 @@ const PerfilAmigo = () => {
               className="image-container"
               style={{
                 backgroundImage: `url(${
-                  amigo.imagenBase64
-                    ? "data:image/jpeg;base64," + amigo.imagenBase64
+                  amigo.imagenes && amigo.imagenes[0]
+                    ? "data:image/jpeg;base64," + amigo.imagenes[0].imagenBase64
                     : "/images/user.jpeg"
                 })`,
               }}
@@ -58,7 +61,27 @@ const PerfilAmigo = () => {
             <p>
               <strong>Edad:</strong> {amigo.edad} años
             </p>
+
+            <div className="galeria">
+              {amigo.imagenes.map((imagen) => {
+                console.log(imagen);
+                return (
+                  <Foto
+                    foto={"data:image/jpeg;base64," + imagen.imagenBase64}
+                    setPreview={setFoto}
+                    conX={false}
+                  />
+                );
+              })}
+            </div>
+            <Preview
+              foto={foto}
+              handleClose={() => {
+                setFoto("");
+              }}
+            />
           </div>
+
           <div className="perfil-amigo-right">
             <h1>Perfil de amigo</h1>
             <div className="profile-description w-100">
