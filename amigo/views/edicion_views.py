@@ -61,7 +61,7 @@ def findEmail(request):
     try:
         send_mail(
             "Restablecer contraseña",
-            f"Hola {user.username}\nEl enlace para restablecer su contraseña es: https://friender.vercel.app/new-password/{codigoVerificacion}\n expira en 15 min",
+            f"Hola {user.username}\nEl enlace para restablecer su contraseña es: https://cosas-psi.vercel.app/new-password/{codigoVerificacion}\n expira en 15 min",
             config("EMAIL_HOST_USER"),
             [user.email],
             fail_silently=False,
