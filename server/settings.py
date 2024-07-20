@@ -14,6 +14,7 @@ from decouple import config
 from pathlib import Path
 import os
 
+STATIC_URL = "/static/"
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -91,7 +92,7 @@ WSGI_APPLICATION = "server.wsgi.application"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_USER = "friender.oficial@gmail.com"
 EMAIL_HOST_PASSWORD = "jexk hixp firy oyzr"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -100,11 +101,11 @@ EMAIL_USE_SSL = False
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT"),
+        "NAME": "sis",
+        "USER": "jhon",
+        "PASSWORD": "K4OS5I4gYpAj7SDeJBtXFLjPiblCfM5H",
+        "HOST": "dpg-cqd7r7bv2p9s73e9jin0-a.oregon-postgres.render.com",
+        "PORT": "5432",
     }
 }
 
@@ -142,7 +143,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
